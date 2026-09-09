@@ -14,7 +14,3 @@ Repositório destinado às atividades da disciplina de **Processamento de Lingua
 - Caio Abrão Manarim
 - Haiko Rüdiger
 - Letícia Fruet
-
-## Conteúdo
-
-Este repositório contém os exercícios, trabalhos e projetos desenvolvidos durante a disciplina.
