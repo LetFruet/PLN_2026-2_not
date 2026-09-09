@@ -4,7 +4,7 @@ Repositório destinado às atividades da disciplina de **Processamento de Lingua
 
 ## Informações da disciplina
 
-**Turma:** PLN 2026/2  
+**Turma:** SUP-CMP.180.0.1-2026/2
 **Professor:** Maiko Rafael Spiess
 
 ## Alunos
