@@ -14,3 +14,7 @@ Repositório destinado às atividades da disciplina de **Processamento de Lingua
 - Caio Abrão Manarim
 - Haiko Rüdiger
 - Letícia Fruet
+
+## Trabalhos
+
+**Unidade 2:** https://colab.research.google.com/drive/1JJolci01hPn7dAQAQPswjHX415UQYYuN?usp=sharing
