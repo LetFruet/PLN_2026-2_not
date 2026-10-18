@@ -1,0 +1,141 @@
+Fornecedor: OpenAi
+Modelo: GPT-6
+
+Você é um professor/orientador de Processamento de Linguagem Natural e desenvolvedor Python experiente.
+
+Preciso implementar a parte de **classificação** de um trabalho acadêmico de PLN, seguindo principalmente os conceitos e o nível de complexidade apresentados na **Aula 08**.
+
+Vou anexar:
+
+- o notebook atual do projeto, que já contém coleta, pré-processamento e outras técnicas de PLN;
+- o arquivo CSV/JSON exportado por esse notebook;
+- o notebook/material da Aula 08 sobre classificação;
+- o exemplo utilizado pelo professor;
+- o enunciado do Trabalho 03.
+
+## Contexto
+
+O projeto trabalha com receitas coletadas do TudoGostoso.
+
+O notebook anterior já realiza:
+
+- coleta das receitas;
+- paginação;
+- tratamento de duplicidades;
+- pré-processamento;
+- criação do campo textual para PLN;
+- exportação em CSV/JSON;
+- Bag of Words;
+- TF-IDF;
+- Word2Vec;
+- BERT/BERTimbau;
+- similaridade;
+- clusterização/PCA;
+- busca e recomendação.
+
+**Não altere esse notebook.**
+
+A classificação deve ser implementada em um **novo notebook Colab**, utilizando como entrada o CSV processado exportado pelo primeiro notebook.
+
+## Objetivo
+
+Criar um experimento de classificação supervisionada capaz de prever a categoria de uma receita e comparar o desempenho das seguintes representações:
+- BoW;
+- TF-IDF;
+- Word2Vec;
+- BERTimbau.
+
+Use o **mesmo classificador para as quatro representações**, preferencialmente a Regressão Logística apresentada na Aula 08, para que a comparação avalie principalmente o efeito da representação textual.
+
+## Regras metodológicas
+
+Antes de implementar, analise os arquivos anexados e confirme os nomes reais das colunas. Não presuma campos que não existam.
+
+Verifique também se há receitas associadas a mais de uma categoria.
+
+Se houver registros multirrótulo, utilize para este experimento apenas as receitas que possuam **uma única categoria**, pois queremos seguir a abordagem multiclasse ensinada na Aula 08.
+
+Não exclua esses registros da base original. Apenas deixe-os fora do experimento e inclua uma explicação no notebook dizendo que esses casos caracterizam um problema multilabel que poderia ser tratado futuramente.
+
+Utilize:
+
+- divisão de 80% para treino e 20% para teste;
+- `random_state=42`;
+- `stratify=y`;
+- exatamente os mesmos registros de treino/teste para as quatro representações.
+
+Evite vazamento de dados:
+
+- BoW deve aprender o vocabulário somente no treino;
+- TF-IDF deve executar `fit` somente no treino e `transform` no teste;
+- Word2Vec deve ser treinado somente com os textos de treino;
+- BERTimbau deve ser usado somente como gerador de embeddings, sem fine-tuning;
+- a Regressão Logística deve ser treinada somente sobre os dados de treino.
+
+Para o Word2Vec, mantenha parâmetros próximos aos já utilizados no projeto e informe palavras OOV encontradas no conjunto de teste.
+
+Para o BERT, reutilize o modelo:
+
+`neuralmind/bert-base-portuguese-cased`
+
+Antes de escolher o `max_length`, analise a distribuição do número de tokens e escolha um limite adequado, respeitando o máximo do modelo.
+
+## Avaliação
+
+Para cada representação, apresente:
+
+- accuracy;
+- precision;
+- recall;
+- F1-score;
+- Macro F1;
+- `classification_report`;
+- matriz de confusão.
+
+Monte também uma tabela final comparando as quatro representações.
+
+Considere o **Macro F1** uma métrica importante para avaliar o equilíbrio do desempenho entre as categorias, mas não ignore a acurácia.
+
+Depois, identifique automaticamente o melhor resultado e mostre alguns erros de classificação contendo, pelo menos:
+
+- título da receita;
+- categoria real;
+- categoria prevista.
+
+Faça uma breve interpretação dos erros, principalmente quando houver categorias semanticamente próximas.
+
+## Teste com dados novos
+
+Ao final, crie de 3 a 5 pequenas receitas de exemplo que não participaram da base e execute a classificação com os quatro modelos.
+
+Esses exemplos devem ser apresentados apenas como **avaliação qualitativa**, deixando explícito que não substituem as métricas calculadas sobre o conjunto de teste.
+
+## Estrutura desejada do novo Colab
+
+Organize o notebook aproximadamente assim:
+
+1. Objetivo
+2. Bibliotecas
+3. Importação do CSV processado
+4. Validação dos dados
+5. Preparação dos rótulos
+6. Tratamento das receitas multirrótulo
+7. Distribuição das classes
+8. Separação treino/teste
+9. Função comum de avaliação
+10. BoW + Regressão Logística
+11. TF-IDF + Regressão Logística
+12. Word2Vec + Regressão Logística
+13. BERTimbau + Regressão Logística
+14. Comparação dos resultados
+15. Matrizes de confusão
+16. Análise dos erros
+17. Teste com receitas novas
+18. Síntese dos resultados
+19. Exportação dos principais resultados
+
+Inclua células Markdown explicando de forma simples o objetivo de cada etapa, pois preciso compreender e apresentar o código.
+
+Não implemente técnicas desnecessariamente avançadas e não inclua Jev, fine-tuning de BERT ou classificação multilabel nesta primeira implementação.
+
+Primeiro analise os anexos e confirme se os dados disponíveis são suficientes. Depois, construa o novo notebook seguindo a estrutura acima e respeitando o padrão do material da Aula 08.
