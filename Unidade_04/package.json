@@ -1,0 +1,1 @@
+{"name":"improvisa-pln","private":true,"scripts":{"build":"node scripts/build.mjs","dev":"node scripts/build.mjs && node scripts/dev.mjs","test":"node teste.mjs && node --test worker/*.test.mjs"}}
