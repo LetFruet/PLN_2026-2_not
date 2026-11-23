@@ -1,4 +1,4 @@
-import { mkdir,readFile,writeFile,copyFile } from 'node:fs/promises';
+import { mkdir,readFile,writeFile } from 'node:fs/promises';
 const root = new URL('../',import.meta.url);
 const read = p => readFile(new URL(p,root),'utf-8');
 const assetTypes={'index.html':'text/html','metodo.html':'text/html','resultados.html':'text/html','resultados.mjs':'text/javascript','style.css':'text/css','app.mjs':'text/javascript','avaliacao.mjs':'text/javascript','busca.mjs':'text/javascript','utensilios.mjs':'text/javascript','receitas.json':'application/json'};
@@ -8,10 +8,5 @@ const utensilios=(await read('web/utensilios.mjs')).replace('export const','cons
 const busca=(await read('web/busca.mjs')).replace(/^import .*;\n/gm,'').replaceAll('export ','');
 const rag=(await read('worker/rag.mjs')).replaceAll('export ','');
 const handler=(await read('worker/handler.mjs')).replace(/^import .*;\n/gm,'').replaceAll('export ','');
-for (const dir of ['dist/server','dist/.openai']) await mkdir(new URL(dir,root),{recursive:true});
+await mkdir(new URL('dist/server',root),{recursive:true});
 await writeFile(new URL('dist/server/index.js',root),utensilios+'\n'+busca+'\n'+rag+'\n'+handler+'\nconst assets='+JSON.stringify(assets)+';\nexport default criarServidor(assets);\n');
-try {
-  await copyFile(new URL('.openai/hosting.json',root),new URL('dist/.openai/hosting.json',root));
-} catch (error) {
-  if (error.code !== 'ENOENT') throw error;
-}
