@@ -161,7 +161,7 @@ Os exemplos completos e as evidências dessa avaliação estão registrados no d
 | Prompt engineering e saídas estruturadas | Sim | O prompt orienta a geração com base nas fontes, e o servidor valida a estrutura JSON e os identificadores das respostas. |
 | RAG e recuperação de informações | Sim | A busca recupera receitas da base, cujas informações são utilizadas como contexto para gerar explicações. |
 | Agentes e integração com ferramentas | Não | A sequência de etapas é definida pelo código. O modelo não escolhe ferramentas nem executa ações autonomamente. |
-| Modelos locais ou quantizados | Parcialmente | Não executamos nem quantizamos modelos localmente. Utilizamos um modelo disponibilizado pela Cloudflare em uma variante FP8. |
+| Modelos locais ou quantizados | Não | Não executamos modelos localmente nem realizamos quantização. Utilizamos uma variante FP8 do Llama 3.3 disponibilizada pelo Cloudflare Workers AI. |
 | Processamento multimodal | Não | Os pedidos, os dados e as explicações são processados em texto. |
 | Outras técnicas avançadas de PLN | Sim | A busca combina TF-IDF, correspondência lexical e filtros de equipamentos, comparando os resultados com o método de referência. |
 
