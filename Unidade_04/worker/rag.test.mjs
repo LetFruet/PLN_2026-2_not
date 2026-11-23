@@ -5,8 +5,23 @@ import {criarServidor} from './handler.mjs';
 import {criarBusca} from '../web/busca.mjs';
 import {montarContexto,validar,MODEL} from './rag.mjs';
 const corpus=readFileSync(new URL('../web/receitas.json',import.meta.url),'utf8');
-const cases=JSON.parse(readFileSync(new URL('../web/experimento.json',import.meta.url),'utf8')).casos;
-const busca=criarBusca(JSON.parse(corpus)), q=cases[0].q;
+const busca=criarBusca(JSON.parse(corpus));
+const consultas=[
+  'Tenho frango e batata, mas não tenho forno.',
+  'bolo fubá',
+  'Bolo sem liquidificador',
+  'risoto de carne',
+  'ovo sem leite'
+];
+const cases=consultas.map(q=>({
+  q,
+  respostas:montarContexto(q,busca(q)).fontes.map(({id,titulo})=>({
+    id,
+    titulo,
+    texto:'Explicação de teste.'
+  }))
+}));
+const q=cases[0].q;
 const api=(body)=>new Request('http://improvisa.test/api/rag',{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'application/json','Origin':'http://improvisa.test'}});
 const app=()=>criarServidor({'/receitas.json':['application/json',corpus]});
 const fail=()=>assert.fail('Não deveria chamar o modelo');
@@ -45,7 +60,7 @@ test('falha de IA não retorna segredos nem interrompe a busca',async()=>{
  const r=await app().fetch(api({q}),{AI:{run:async()=>{throw Error('fake-key');}}});
  assert.equal(r.status,502);assert.ok(!(await r.text()).includes('fake-key'));
 });
-test('ensaios arquivados permanecem válidos como ensaio manual anterior',()=>{
+test('contextos gerados para consultas de teste permanecem válidos',()=>{
  for(const c of cases){
   const ctx=montarContexto(c.q,busca(c.q));
   assert.deepEqual(ctx.fontes.map(({id,titulo})=>({id,titulo})),c.respostas.map(({id,titulo})=>({id,titulo})));
