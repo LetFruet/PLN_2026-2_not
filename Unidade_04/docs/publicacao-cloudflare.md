@@ -1,12 +1,6 @@
-# Publicar o Improvisa na Cloudflare
+# Publicação do Improvisa na Cloudflare
 
-O Improvisa está no ar em [improvisa.receitas-pln.workers.dev](https://improvisa.receitas-pln.workers.dev/). A busca funciona nesse endereço sem precisar comprar um domínio ou configurar a API da OpenAI.
-
-Se você só quer testar o recomendador, basta abrir o link. As instruções abaixo são para quem precisa publicar uma cópia do projeto ou atualizar o site.
-
-## Como publicar
-
-Com o Node.js 22 ou superior instalado, abra o terminal na pasta `Unidade_04`, onde estão os arquivos `wrangler.jsonc` e `package.json`. Rode um comando por vez:
+Acesse a pasta que contém `wrangler.jsonc` e `package.json` com Node.js 22 ou superior. O binding Workers AI já está configurado em `wrangler.jsonc` como `AI`. Não precisa de chave da OpenAI nem código de demonstração.
 
 ```sh
 npm test
@@ -14,36 +8,16 @@ npx wrangler login
 npx wrangler deploy
 ```
 
-O primeiro comando roda os testes. O segundo abre o navegador para você autorizar o Wrangler na sua conta Cloudflare. O terceiro compila e publica o projeto. Se for a primeira publicação nessa conta, o Wrangler pode pedir que você escolha um subdomínio `workers.dev`.
+O endereço do projeto é https://improvisa.receitas-pln.workers.dev/ quando publicado na mesma conta e com o mesmo nome de Worker. Confira o endereço mostrado no deploy.
 
-No fim, o terminal mostra o endereço do site. Abra o link e teste **Frango e batata sem forno**. Confira se as sugestões aparecem, se os botões de paginação funcionam e se os links levam às receitas do TudoGostoso.
+Para testar só a busca localmente, execute `npm run dev` e acesse http://localhost:8000/. Neste modo, o binding de IA não existe, então o texto padrão aparece. Para testar também a geração com Workers AI, execute `npm run build` e depois `npx wrangler dev`, usando o endereço informado pelo Wrangler. O teste com IA pode consumir a cota gratuita da conta Cloudflare.
 
-## Como configurar as explicações com IA
+Após publicar, procure por **Frango e batata sem forno**. As receitas devem surgir imediatamente com **Explicação da busca**. Quando o modelo responder, o texto deve mudar para **Explicação com IA (Chatbot RAG)**. Se o modelo falhar ou a cota acabar, a busca e o texto padrão continuam. Teste também paginação, links para a receita original e pedidos sem resultados.
 
-A busca funciona sem IA. Para liberar a geração de explicações no site, abra **Workers & Pages → improvisa → Settings → Variables and Secrets**. Adicione as duas variáveis abaixo em **Production**, com a opção **Secret** marcada, e publique a alteração:
+O Workers AI oferece uma franquia diária no plano gratuito (medida em Neurons). Há um limitador por IP/instância no código, que não substitui limites de uso centralizados. Para maior controle em um site público, configure uma regra de rate limiting da Cloudflare no endpoint `/api/rag`.
 
-| Nome | Valor |
-| --- | --- |
-| `OPENAI_API_KEY` | A chave da API da OpenAI. Ela fica no servidor. |
-| `RAG_ACCESS_CODE` | Um código longo e aleatório escolhido pela equipe. É esse código que a pessoa digita no site para liberar a geração. |
+Os segredos antigos `OPENAI_API_KEY` e `RAG_ACCESS_CODE` não são mais usados pelo código. Caso ainda estejam cadastrados no painel da Cloudflare, podem ser removidos manualmente. Nunca publique segredos no Git.
 
-Também dá para cadastrar as variáveis pelo terminal, na mesma pasta do projeto:
-
-```sh
-npx wrangler secret put OPENAI_API_KEY
-npx wrangler secret put RAG_ACCESS_CODE
-```
-
-Não coloque os valores desses segredos no GitHub. A cobrança da API da OpenAI é separada da hospedagem.
-
-## Como testar o RAG
-
-1. Abra o endereço do site com `/api/status` no fim. Se aparecer `"rag": true`, o servidor encontrou as duas variáveis. Isso não confirma que a OpenAI aceitou uma chamada.
-2. No site, abra **Ativar explicações com IA**, digite o código de demonstração e marque **Gerar explicações com as fontes recuperadas**.
-3. Faça uma nova busca. Confira se cada cartão recebeu uma explicação específica e se o texto condiz com os dados da receita.
-
-**Situação do projeto:** Testamos a busca e a geração de explicações com RAG no endereço público. A API gerou uma explicação específica para cada receita sugerida, e o site mostrou cada texto no cartão correspondente. O ensaio inicial e os testes com respostas simuladas estão descritos no [registro da avaliação](avaliacao-rag.md).
-
-- [Endereços workers.dev](https://developers.cloudflare.com/workers/configuration/routing/workers-dev/)
-- [Publicação de um projeto existente](https://developers.cloudflare.com/workers/framework-guides/automatic-configuration/)
-- [Configuração de segredos na Cloudflare](https://developers.cloudflare.com/workers/configuration/secrets/)
+- [Bindings do Workers AI](https://developers.cloudflare.com/workers-ai/configuration/bindings/)
+- [Cotas e preços do Workers AI](https://developers.cloudflare.com/workers-ai/platform/pricing/)
+- [Documentação do Wrangler](https://developers.cloudflare.com/workers/wrangler/)

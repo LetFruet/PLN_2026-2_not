@@ -1,7 +1,7 @@
 import { mkdir,readFile,writeFile,copyFile } from 'node:fs/promises';
 const root = new URL('../',import.meta.url);
 const read = p => readFile(new URL(p,root),'utf-8');
-const assetTypes={'index.html':'text/html','style.css':'text/css','app.mjs':'text/javascript','avaliacao.mjs':'text/javascript','busca.mjs':'text/javascript','utensilios.mjs':'text/javascript','receitas.json':'application/json'};
+const assetTypes={'index.html':'text/html','metodo.html':'text/html','resultados.html':'text/html','resultados.mjs':'text/javascript','style.css':'text/css','app.mjs':'text/javascript','avaliacao.mjs':'text/javascript','busca.mjs':'text/javascript','utensilios.mjs':'text/javascript','receitas.json':'application/json'};
 const assets={};
 for(const [name,type] of Object.entries(assetTypes)) assets['/'+name]=[type+'; charset=utf-8',await read('web/'+name)];
 const utensilios=(await read('web/utensilios.mjs')).replace('export const','const');

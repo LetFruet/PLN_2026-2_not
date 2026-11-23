@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Metodologia, dados e técnicas de PLN utilizadas no Improvisa.">
+<meta name="theme-color" content="#f8f5eb">
+<title>Método — Improvisa</title>
+<link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<header class="bar"><div class="wrap bar-in">
+<a class="brand" href="/"><span aria-hidden="true">✳</span> improvisa<span class="brand-dot">.</span></a>
+<nav aria-label="Seções do projeto"><a href="/metodo.html" aria-current="page">Método</a><a href="/resultados.html">Resultados</a><a class="nav-cta" href="/#demo">Experimentar <span aria-hidden="true">↗</span></a></nav>
+</div></header>
+<main id="conteudo">
+<section id="como" class="wrap content-section">
+<p class="eyebrow">02 / METODOLOGIA</p>
+<div class="evalbox rag-study" aria-labelledby="problema-title">
+<h3 id="problema-title">Qual problema o Improvisa resolve?</h3>
+<p>Quando a pessoa sabe quais ingredientes tem em casa, mas não sabe o que cozinhar, buscar pelo nome de um prato nem sempre ajuda. Ela também precisa abrir as receitas para descobrir se o preparo exige um utensílio que não tem. O Improvisa parte do pedido da pessoa, como “tenho frango e batata, mas não tenho forno”, e usa os ingredientes e a restrição para selecionar sugestões na base de receitas.</p>
+</div>
+<div class="split"><h2>Como a busca funciona</h2><p>Na Unidade 3, nossa equipe coletou e pré-processou receitas do TudoGostoso. O Improvisa usa essa mesma base para encontrar receitas que combinam com os ingredientes do pedido e verificar, por exemplo, se o preparo menciona um utensílio que a pessoa não tem. Para avaliar essa busca, comparamos suas sugestões com as de uma busca que usa apenas TF-IDF, a técnica da Unidade 3 que compara palavras do pedido com o texto das receitas.</p></div>
+<div class="steps">
+<article><span>01</span><h3>Interpretar</h3><p>O Improvisa faz a <strong>normalização do texto</strong>, deixando as palavras em minúsculas e sem acentos. Depois, identifica os termos da busca e as restrições de utensílios. Em “Tenho frango e batata, mas não tenho forno”, ele busca por “frango” e “batata” e aplica o filtro “sem forno”.</p></article>
+<article><span>02</span><h3>Recuperar</h3><p>O <strong>TF-IDF</strong> dá peso às palavras, e a <strong>similaridade de cosseno</strong> mede o quanto o pedido e o texto de cada receita se parecem. A busca guiada exige que os termos do pedido apareçam no título ou nos ingredientes e filtra receitas com menção aos utensílios que você quer evitar. Na hora de ordenar as sugestões, dá mais peso aos termos encontrados no título do que à similaridade.</p></article>
+<article><span>03</span><h3>Explicar</h3><p>O Improvisa mostra até três receitas por vez. Se houver mais opções, você pode avançar ou voltar sem mudar o pedido nem os filtros. Cada cartão explica por que a receita foi sugerida com base nos termos encontrados e traz o link da receita original no TudoGostoso.</p></article>
+</div>
+<details class="detail methodology-details">
+<summary>Dados, tecnologias e filtros da busca</summary>
+<h3>De onde vêm as receitas?</h3>
+<p>Usamos 620 receitas do TudoGostoso coletadas na Unidade 3, cada uma com seu próprio link. O CSV guarda títulos, ingredientes, categorias, utensílios, etapas de preparo e as palavras já tratadas para análise de texto. Um script em Python reorganiza esses dados em JSON, o formato que o site usa para ler a base.</p>
+<h3>Que tecnologias usamos?</h3>
+<p>A busca roda no navegador, em JavaScript, sem depender de uma API. O RAG combina a busca com um modelo de linguagem para explicar por que cada receita foi sugerida. Na geração, o servidor usa o Workers AI da Cloudflare com o pedido e os dados de até três receitas da página exibida. A explicação com IA substitui automaticamente a explicação padrão quando estiver pronta. Os ingredientes e os links dos cartões vêm da base de receitas.</p>
+<h3 id="dependencias-custos">Dependências e custos</h3>
+<p>A busca roda no navegador com a base de receitas coletada do TudoGostoso na Unidade 3. Ela não consulta o TudoGostoso a cada busca nem tem custo de API. O RAG usa Workers AI da Cloudflare, com franquia gratuita diária e limites de uso. Ao atingir a cota ou se o serviço falhar, o site mantém a explicação padrão da busca, sem interromper as sugestões.</p>
+<h3>Quais restrições a busca entende?</h3>
+<p>O filtro reconhece utensílios do catálogo da Unidade 3 e variações de nome, como “air fryer” e “fritadeira elétrica”. Se você pedir uma receita sem panela de pressão, por exemplo, o site verifica se ela aparece no título, na lista de utensílios ou no modo de preparo. Se não reconhecer a restrição, o assistente avisa e não sugere receitas para aquele pedido. Mesmo quando não há menção ao utensílio, confira o preparo original no TudoGostoso.</p>
+<h3>Como as sugestões são ordenadas?</h3>
+<p>A pontuação combina 50% pelos termos encontrados no título ou nos ingredientes, 35% pelos termos encontrados especificamente no título e 15% pela similaridade de cosseno com TF-IDF. Toda receita sugerida precisa conter todos os termos da busca, então a primeira parte vale o mesmo para todas. Na prática, o que muda a ordem é a correspondência no título e a similaridade TF-IDF.</p>
+</details>
+</section>
+
+</main>
+<footer><div class="wrap footer"><div><a class="brand" href="/"><span aria-hidden="true">✳</span> improvisa<span class="brand-dot">.</span></a><p>Processamento de Linguagem Natural · FURB 2026/2</p></div><div><strong>Equipe</strong><p>Alana Cristina Andreazza · Beatriz Moresco Joaquim · Caio Abrão Manarim · Haiko Rüdiger · Letícia Fruet</p><strong>Fonte de dados</strong><p>TudoGostoso, corpus preparado na Unidade 3.</p></div></div></footer>
+</body>
+</html>

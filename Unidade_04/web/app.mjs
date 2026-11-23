@@ -1,5 +1,4 @@
 import {criarBusca,paginar,POR_PAGINA} from './busca.mjs';
-import {avaliar} from './avaliacao.mjs';
 const $ = s => document.querySelector(s);
 const el = (tag, text, cls) => {
   const e=document.createElement(tag);
@@ -40,6 +39,7 @@ const cards=(items,filtros)=>{
     const termos=match.length===1?'Encontrei este termo do seu pedido':'Encontrei estes termos do seu pedido';
     motivo.append(
       el('h4','Por que sugerimos esta receita?'),
+      el('small','Explicação da busca','recipe-reason-label'),
       el('p',termos+' no título ou na lista de ingredientes: '+match.join(', ')+'.','recipe-reason-text')
     );
     if(filtros.length) motivo.append(el('p','Não identifiquei menção a '+filtros.join(', ')+' nos dados da receita. Confira o preparo no TudoGostoso.'));
@@ -53,7 +53,7 @@ const cards=(items,filtros)=>{
   return group;
 };
 const historico=$('#history'), input=$('#query'), status=$('#base-status');
-let busca, requisicao;
+let busca, requisicao, ragDisponivel=false;
 function executar(q){
   if(!busca) {status.textContent='A busca ainda não está disponível.'; return;}
   if(!q.trim()) return;
@@ -77,7 +77,7 @@ function executar(q){
         list
       );
     }
-    parts.push(trace('Como a busca interpretou seu pedido',detalhes));
+    parts.push(trace('Detalhes técnicos da busca',detalhes));
   }
   historico.replaceChildren(...parts);
   if(!items.length) return;
@@ -116,9 +116,7 @@ function executar(q){
       primeiro.focus({preventScroll:true});
       primeiro.scrollIntoView({block:'nearest'});
     }
-    if(!$('#rag-settings').hidden && $('#rag-on').checked){
-      explicar(q,lote.items,pagina,grupo,current,cache);
-    }
+    if(ragDisponivel) explicar(q,lote.items,pagina,grupo,current,cache);
   }
   anterior.addEventListener('click',()=>{if(!anterior.disabled){pagina--;mostrar(true);}});
   proxima.addEventListener('click',()=>{if(!proxima.disabled){pagina++;mostrar(true);}});
@@ -126,47 +124,34 @@ function executar(q){
 }
 async function explicar(q,items,pagina,grupo,current,cache){
   const aplicar=(explicacoes)=>{
-    const cards=grupo.querySelectorAll('.recipe');
+    const cartoes=grupo.querySelectorAll('.recipe');
     explicacoes.forEach(({id,texto},i)=>{
-      const resumo=cards[i]?.querySelector('.recipe-reason-text');
-      if(id==='R'+(i+1) && resumo) resumo.textContent=texto;
+      const resumo=cartoes[i]?.querySelector('.recipe-reason-text');
+      const rotulo=cartoes[i]?.querySelector('.recipe-reason-label');
+      if(id==='R'+(i+1) && resumo && rotulo){
+        resumo.textContent=texto;
+        rotulo.textContent='Explicação com IA (Chatbot RAG)';
+      }
     });
   };
   if(cache.has(pagina)){aplicar(cache.get(pagina));return;}
-  const code=$('#access-code').value;
-  const nota=el('p',code?'Gerando explicações com as receitas encontradas…':'Preencha o código de demonstração para gerar explicações.','bubble');
+  const nota=el('p','Gerando explicação com IA…','rag-progress');
+  nota.setAttribute('role','status');
   grupo.before(nota);
-  if(!code) return;
   try{
-    const response=await fetch('./api/rag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:q.trim(),code,pagina}),signal:current.signal});
+    const response=await fetch('./api/rag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:q.trim(),pagina}),signal:current.signal});
     const data=await response.json();
     if(current.signal.aborted) return;
     if(!response.ok || data.modo!=='rag' || data.explicacoes?.length!==items.length){
-      nota.textContent=data.erro||'A busca está disponível, mas não houve explicação gerada.';
+      nota.textContent='A explicação da busca foi mantida. '+(data.erro||'A IA não respondeu agora.');
       return;
     }
     cache.set(pagina,data.explicacoes);
     aplicar(data.explicacoes);
-    nota.textContent='Explicações geradas com as fontes recuperadas.';
+    nota.remove();
   }catch{
-    if(!current.signal.aborted) nota.textContent='Não consegui gerar explicações agora. A busca continua disponível.';
+    if(!current.signal.aborted) nota.textContent='A IA não respondeu agora. Mantivemos a explicação da busca.';
   }
-}
-function montarAvaliacao(){
-  const div=el('div',undefined,'tablewrap'),table=el('table'), thead=el('thead'),tbody=el('tbody'), tr=el('tr');
-  ['Consulta','Indicador no top 3','TF-IDF','Busca guiada'].forEach(t=>{const h=el('th',t);h.scope='col';tr.append(h);});
-  thead.append(tr);table.append(thead,tbody);
-  const fmt=(a,b)=> b ? a+'/'+b : '0 (sem retorno)';
-  for(const r of avaliar(busca)){
-    const linha=el('tr');
-    [r.q,r.criterio,fmt(r.ref,r.nRef),fmt(r.items,r.nItems)].forEach(t=>linha.append(el('td',t)));
-    tbody.append(linha);
-  }
-  div.append(table);
-  $('#evaluation-output').replaceChildren(el('h3','Sete consultas, dois métodos'),el('p','Cada linha compara o que os dois métodos encontraram para o mesmo pedido. Um valor como 2/3 significa que duas das três sugestões entraram na contagem daquela linha.','metric'),
-    attributo('Pedidos por nome ou ingredientes:', 'Nas três primeiras linhas, contamos quantos títulos incluem todos os termos principais. Por exemplo, em “bolo fubá”, o título precisa ter “bolo” e “fubá”. Aqui, quanto maior a contagem, melhor.'),
-    attributo('Pedidos com restrição:', 'Em “frango e batata sem forno”, contamos quantas sugestões têm indício de uso de forno nos dados da receita. Aqui, quanto menor a contagem, melhor. Em “ovo sem leite”, verificamos se o método devolve sugestões mesmo sem saber verificar essa restrição.'),
-    el('p','As contagens são automáticas. Não detectar um utensílio nos dados não garante que a receita possa ser feita sem ele.','metric'),div);
 }
 $('#search').addEventListener('submit',e=>{e.preventDefault(); executar(input.value);});
 for(const btn of document.querySelectorAll('[data-query]')) btn.addEventListener('click',()=>{input.value=btn.dataset.query;executar(input.value);});
@@ -177,10 +162,8 @@ try{
   busca=criarBusca(base);
   $('.send').disabled=false;
   status.textContent=base.length+' receitas disponíveis · Abra a receita original no TudoGostoso para conferir os ingredientes e o modo de preparo.';
-  montarAvaliacao();
 }catch(e){
   status.textContent='Não foi possível carregar a base. Recarregue a página ou execute o site com um servidor local.';
-  $('#evaluation-output').textContent='Resultados indisponíveis porque a base não carregou.';
   console.error(e);
 }
 
@@ -188,7 +171,7 @@ try{
   const r=await fetch('./api/status');
   const info=await r.json();
   if(info.rag){
-    $('#rag-settings').hidden=false;
-    $('#mode-badge').textContent='Busca + RAG opcional';
+    ragDisponivel=true;
+    $('#mode-badge').textContent='Busca + Chatbot RAG';
   }
 }catch{}

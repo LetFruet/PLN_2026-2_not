@@ -12,8 +12,8 @@
 <body>
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 <header class="bar"><div class="wrap bar-in">
-<a class="brand" href="#inicio"><span aria-hidden="true">✳</span> improvisa<span class="brand-dot">.</span></a>
-<nav aria-label="Seções do projeto"><a href="#como">Método</a><a href="#avaliacao">Resultados</a><a class="nav-cta" href="#demo">Experimentar <span aria-hidden="true">↗</span></a></nav>
+<a class="brand" href="/"><span aria-hidden="true">✳</span> improvisa<span class="brand-dot">.</span></a>
+<nav aria-label="Seções do projeto"><a href="/metodo.html">Método</a><a href="/resultados.html">Resultados</a><a class="nav-cta" href="/#demo">Experimentar <span aria-hidden="true">↗</span></a></nav>
 </div></header>
 <main id="conteudo">
 <section class="hero wrap" id="inicio">
@@ -61,106 +61,13 @@
 <button type="button" data-query="Risoto de carne">Risoto de carne</button>
 </div>
 <form id="search"><label for="query">Seu pedido</label><div class="inputrow"><input id="query" name="query" maxlength="180" required placeholder="Ex.: Tenho frango e batata, mas não tenho forno." autocomplete="off"><button class="button send" type="submit" disabled>Buscar <span aria-hidden="true">↗</span></button></div></form>
-<details class="detail" id="rag-settings" hidden><summary>Ativar explicações com IA</summary><p>A consulta e informações das receitas recuperadas serão enviadas à API da OpenAI quando a opção estiver ativa. Não inclua dados pessoais no pedido.</p><label for="access-code">Código de demonstração</label> <input id="access-code" type="password" maxlength="128" autocomplete="off"><br><label><input type="checkbox" id="rag-on"> Gerar explicações com as fontes recuperadas</label></details>
+<p class="hint">As receitas aparecem primeiro. Quando disponível, o Chatbot RAG gera explicações automaticamente com o Workers AI. Se a geração falhar, permanece a explicação da busca. Não inclua dados pessoais no pedido.</p>
 <p id="base-status" class="hint" role="status">Carregando a base de receitas…</p>
 </div>
 </div>
 </div></section>
 
-<section id="como" class="wrap content-section">
-<p class="eyebrow">02 / METODOLOGIA</p>
-<div class="evalbox rag-study" aria-labelledby="problema-title">
-<h3 id="problema-title">Qual problema o Improvisa resolve?</h3>
-<p>Quando a pessoa sabe quais ingredientes tem em casa, mas não sabe o que cozinhar, buscar pelo nome de um prato nem sempre ajuda. Ela também precisa abrir as receitas para descobrir se o preparo exige um utensílio que não tem. O Improvisa parte do pedido da pessoa, como “tenho frango e batata, mas não tenho forno”, e usa os ingredientes e a restrição para selecionar sugestões na base de receitas.</p>
-</div>
-<div class="split"><h2>Como a busca funciona</h2><p>Na Unidade 3, nossa equipe coletou e pré-processou receitas do TudoGostoso. O Improvisa usa essa mesma base para encontrar receitas que combinam com os ingredientes do pedido e verificar, por exemplo, se o preparo menciona um utensílio que a pessoa não tem. Para avaliar essa busca, comparamos suas sugestões com as de uma busca que usa apenas TF-IDF, a técnica da Unidade 3 que compara palavras do pedido com o texto das receitas.</p></div>
-<div class="steps">
-<article><span>01</span><h3>Interpretar</h3><p>O Improvisa faz a <strong>normalização do texto</strong>, deixando as palavras em minúsculas e sem acentos. Depois, identifica os termos da busca e as restrições de utensílios. Em “Tenho frango e batata, mas não tenho forno”, ele busca por “frango” e “batata” e aplica o filtro “sem forno”.</p></article>
-<article><span>02</span><h3>Recuperar</h3><p>O <strong>TF-IDF</strong> dá peso às palavras, e a <strong>similaridade de cosseno</strong> mede o quanto o pedido e o texto de cada receita se parecem. A busca guiada exige que os termos do pedido apareçam no título ou nos ingredientes e filtra receitas com menção aos utensílios que você quer evitar. Na hora de ordenar as sugestões, dá mais peso aos termos encontrados no título do que à similaridade.</p></article>
-<article><span>03</span><h3>Explicar</h3><p>O Improvisa mostra até três receitas por vez. Se houver mais opções, você pode avançar ou voltar sem mudar o pedido nem os filtros. Cada cartão explica por que a receita foi sugerida com base nos termos encontrados e traz o link da receita original no TudoGostoso.</p></article>
-</div>
-<details class="detail methodology-details">
-<summary>Dados, tecnologias e filtros da busca</summary>
-<h3>De onde vêm as receitas?</h3>
-<p>Usamos 620 receitas do TudoGostoso coletadas na Unidade 3, cada uma com seu próprio link. O CSV guarda títulos, ingredientes, categorias, utensílios, etapas de preparo e as palavras já tratadas para análise de texto. Um script em Python reorganiza esses dados em JSON, o formato que o site usa para ler a base.</p>
-<h3>Que tecnologias usamos?</h3>
-<p>A busca roda no navegador, em JavaScript, sem depender de uma API. O RAG combina a busca com um modelo de linguagem para explicar por que cada receita foi sugerida. Na etapa de geração, o servidor envia à API Responses da OpenAI apenas o pedido e os dados de até três receitas da página exibida. Os ingredientes e os links dos cartões vêm da base de receitas.</p>
-<h3 id="dependencias-custos">Dependências e custos</h3>
-<p>A busca roda no navegador com a base de receitas coletada do TudoGostoso na Unidade 3. Ela não consulta o TudoGostoso a cada busca nem tem custo de API. A geração de explicações com RAG depende da API da OpenAI e pode gerar cobrança por uso para a conta do projeto.</p>
-<h3>Quais restrições a busca entende?</h3>
-<p>O filtro reconhece utensílios do catálogo da Unidade 3 e variações de nome, como “air fryer” e “fritadeira elétrica”. Se você pedir uma receita sem panela de pressão, por exemplo, o site verifica se ela aparece no título, na lista de utensílios ou no modo de preparo. Se não reconhecer a restrição, o assistente avisa e não sugere receitas para aquele pedido. Mesmo quando não há menção ao utensílio, confira o preparo original no TudoGostoso.</p>
-<h3>Como as sugestões são ordenadas?</h3>
-<p>A pontuação combina 50% pelos termos encontrados no título ou nos ingredientes, 35% pelos termos encontrados especificamente no título e 15% pela similaridade de cosseno com TF-IDF. Toda receita sugerida precisa conter todos os termos da busca, então a primeira parte vale o mesmo para todas. Na prática, o que muda a ordem é a correspondência no título e a similaridade TF-IDF.</p>
-</details>
-</section>
-
-<section id="avaliacao" class="evaluation"><div class="wrap content-section">
-<p class="eyebrow">03 / RESULTADOS E DISCUSSÃO</p><div class="split"><h2>Comparação com a Unidade 3</h2><p>Retomamos o TF-IDF sem filtros, técnica usada na Unidade 3, e o comparamos com a busca guiada do Improvisa em sete pedidos, usando a mesma base de 620 receitas. A tabela mostra os resultados entre as três primeiras sugestões de cada método.</p></div>
-<div id="evaluation-output" class="evalbox">Preparando os resultados dos testes…</div>
-<div class="evalbox rag-study">
-<h3>Como interpretamos os resultados</h3>
-<p><strong>A busca guiada trouxe títulos mais próximos em dois pedidos:</strong> Para “bolo fubá”, as três primeiras sugestões tinham as duas palavras no título, contra uma no TF-IDF sem filtros. Para “frango com batata”, a comparação foi de três contra duas. Isso mostra uma diferença na correspondência dos títulos, mas não garante que as receitas aproveitem exatamente os ingredientes que a pessoa tem.</p>
-<p><strong>Os filtros fizeram diferença quando faltava um utensílio:</strong> No pedido “frango e batata sem forno”, duas das três sugestões do TF-IDF tinham indício de uso de forno. Nenhuma das três da busca guiada tinha esse indício. Também não apareceram indícios do utensílio evitado nas sugestões de “bolo sem liquidificador” e “frango sem panela de pressão”. O teste mede o que foi identificado nos dados, não se a receita pode ser feita sem o utensílio na prática.</p>
-<p><strong>Resultado sem melhoria:</strong> Em “risoto de carne”, nenhum dos métodos trouxe um título que correspondesse ao pedido. O TF-IDF retornou três sugestões, e a busca guiada não retornou nenhuma. Ela evitou sugestões pouco relacionadas, mas não resolveu o pedido. A exigência de encontrar todos os termos também pode excluir receitas que usam sinônimos.</p><p><strong>Restrição não atendida:</strong> Em “ovo sem leite”, a busca guiada não sugeriu receitas porque não verifica restrições alimentares.</p>
-<p class="notes">Essas conclusões valem para os sete pedidos testados. Os testes não medem a satisfação dos usuários nem a qualidade das explicações geradas.</p>
-</div>
-<section class="evalbox rag-study tested-examples" aria-labelledby="tested-examples-title">
-<h3 id="tested-examples-title">Exemplos de entrada e saída</h3>
-<div class="tested-examples-grid">
-<article>
-<h4>Frango e batata sem forno</h4>
-<p><strong>Entrada</strong><br>“Tenho frango e batata, mas não tenho forno.”</p>
-<p><strong>Saída</strong><br>8 sugestões encontradas. As três primeiras foram:</p>
-<ol>
-<li>Frango com batata — 55 min</li>
-<li>Batata suíça — 15 min</li>
-<li>Strogonoff de frango simples — 30 min</li>
-</ol>
-<p><strong>O que observamos</strong><br>A busca não detectou menção a forno nos dados dessas três receitas. Ainda assim, vale conferir os ingredientes. O strogonoff, por exemplo, pede batata palha, não batata comum.</p>
-</article>
-<article>
-<h4>Bolo de fubá</h4>
-<p><strong>Entrada</strong><br>“bolo fubá”</p>
-<p><strong>Saída</strong><br>7 sugestões encontradas. As três primeiras foram:</p>
-<ol>
-<li>Bolo de fubá cremoso — 40 min</li>
-<li>Bolo de fubá simples — 45 min</li>
-<li>Bolo de fubá de liquidificador cremoso sem trigo e assado na airfryer — 50 min</li>
-</ol>
-<p><strong>O que observamos</strong><br>As três primeiras receitas têm “bolo” e “fubá” no título. A terceira mostra que a mesma busca pode trazer versões com métodos de preparo diferentes.</p>
-</article>
-</div>
-<p>Para ver os resultados completos, com ingredientes, links e outras sugestões, use os botões de exemplo no <a href="#demo">recomendador</a> ou escreva seu próprio pedido.</p>
-</section>
-<div class="evalbox rag-study">
-<h3 id="tecnicas-unidade-4">Técnicas de PLN usadas na Unidade 4</h3>
-<ul class="conclusion-points">
-<li><strong>Busca guiada e filtros:</strong> Retomamos o TF-IDF da Unidade 3 e acrescentamos a correspondência no título e nos ingredientes, além dos filtros de utensílios. Isso permite levar em conta pedidos como “sem forno”, que a busca de referência não trata como restrição.</li>
-<li><strong>RAG e recuperação de informações:</strong> Escolhemos o RAG para que a explicação tenha como base as receitas recuperadas. A busca seleciona as sugestões, e os dados dessas receitas servem de contexto para a geração. Os ingredientes e os links dos cartões vêm da base original.</li>
-<li><strong>Modelo de linguagem (LLM):</strong> No ensaio, o modelo transformou os dados recuperados em explicações curtas. Por exemplo, destacou que o strogonoff pede batata palha, embora a busca tenha encontrado a palavra “batata”. O modelo não escolhe as receitas.</li>
-<li><strong>Prompt engineering e saídas estruturadas:</strong> O prompt orienta o modelo a usar só os dados fornecidos. A integração pede uma resposta em JSON com o identificador de cada receita. Nos testes com respostas simuladas, o servidor verificou os identificadores para associar as explicações aos cartões corretos.</li>
-</ul>
-</div>
-<section class="evalbox rag-study" aria-labelledby="conclusoes-title">
-<h3 id="conclusoes-title">Resultados e limitações encontradas</h3>
-<ul class="conclusion-points">
-<li><strong>Busca lexical e filtros:</strong> O TF-IDF pondera os termos, e o cosseno compara o pedido com a receita. A busca guiada também exige os termos do pedido no título ou nos ingredientes e filtra utensílios. No pedido “frango e batata sem forno”, duas das três primeiras receitas da busca sem filtros (TF-IDF) tinham indícios de uso de forno. Na busca guiada, nenhuma das três primeiras tinha esse indício nos dados da receita.</li>
-<li><strong>Limites da busca, dos dados e dos testes:</strong> A busca por palavras pode ignorar sinônimos ou confundir ingredientes parecidos. Também não confere se a pessoa tem todos os itens, sugere substituições ou verifica alergias. Em 248 das 620 receitas, a lista de utensílios está vazia. O modo de preparo ajuda a identificar o que foi usado, mas não detectar um utensílio não garante que ele seja dispensável. Os sete pedidos testados medem correspondência de termos e indícios de utensílios, sem avaliação sistemática da relevância por pessoas.</li>
-<li><strong>As explicações do RAG condizem com as receitas?</strong> Comparamos nove explicações com os dados das receitas sugeridas. Nenhuma citou ingredientes que não estavam nesses dados. Em um teste separado, usamos respostas simuladas para conferir se cada explicação era vinculada à receita certa.</li>
-<li><strong>Como melhorar:</strong> Distinguir ingredientes principais de acompanhamentos. Por exemplo, o strogonoff pede batata palha, então encontrar a palavra “batata” não significa que a receita aproveite a batata comum que a pessoa tem. Outra melhoria é priorizar receitas que peçam menos itens extras e reconhecer utensílios indicados indiretamente no preparo. Para lidar com pedidos escritos de formas diferentes, podemos comparar a busca atual com uma que combine TF-IDF e embeddings (representações do significado do texto). Para avaliar essas mudanças, podemos revisar manualmente as três primeiras sugestões de mais pedidos e medir quantos ficam sem resposta.</li>
-</ul>
-</section>
-<details class="detail"><summary>Quadro de técnicas da Unidade 4</summary><div class="tablewrap"><table><thead><tr><th scope="col">Tecnologia ou abordagem</th><th scope="col">Utilizada?</th><th scope="col">Aplicação ou justificativa</th></tr></thead><tbody>
-<tr><td>LLMs e modelos de linguagem</td><td>Sim</td><td>A etapa de geração usa um modelo de linguagem para explicar por que cada receita sugerida pode servir. A escolha das receitas é feita pela busca.</td></tr>
-<tr><td>Prompt engineering e saídas estruturadas</td><td>Sim</td><td>O prompt orienta o modelo a usar os dados das receitas encontradas. O servidor confere se o identificador de cada resposta em JSON corresponde ao cartão certo.</td></tr>
-<tr><td>RAG e recuperação de informações</td><td>Sim</td><td>A busca recupera receitas da base. Os dados dessas receitas servem de contexto para o modelo explicar as sugestões.</td></tr>
-<tr><td>Agentes e integração com ferramentas</td><td>Não</td><td>O código define a sequência de etapas. O modelo não escolhe ferramentas nem executa ações por conta própria.</td></tr>
-<tr><td>Modelos locais ou quantizados</td><td>Não</td><td>A etapa de geração usa um modelo acessado por API. O projeto não executa um modelo local nem usa uma versão quantizada.</td></tr>
-<tr><td>Processamento multimodal (texto, imagem, áudio)</td><td>Não</td><td>Os pedidos e as explicações são em texto. A aplicação não analisa imagens nem áudio.</td></tr>
-<tr><td>Outras técnicas avançadas de PLN</td><td>Sim</td><td>A busca guiada combina TF-IDF com termos no título e nos ingredientes e aplica filtros de utensílios. Comparamos seus resultados com os do TF-IDF sem filtros.</td></tr>
-</tbody></table></div></details>
-</div></section>
 </main>
-<footer><div class="wrap footer"><div><a class="brand" href="#inicio"><span aria-hidden="true">✳</span> improvisa<span class="brand-dot">.</span></a><p>Processamento de Linguagem Natural · FURB 2026/2</p></div><div><strong>Equipe</strong><p>Alana Cristina Andreazza · Beatriz Moresco Joaquim · Caio Abrão Manarim · Haiko Rüdiger · Letícia Fruet</p><strong>Fonte de dados</strong><p>TudoGostoso, corpus preparado na Unidade 3.</p></div></div></footer>
+<footer><div class="wrap footer"><div><a class="brand" href="/"><span aria-hidden="true">✳</span> improvisa<span class="brand-dot">.</span></a><p>Processamento de Linguagem Natural · FURB 2026/2</p></div><div><strong>Equipe</strong><p>Alana Cristina Andreazza · Beatriz Moresco Joaquim · Caio Abrão Manarim · Haiko Rüdiger · Letícia Fruet</p><strong>Fonte de dados</strong><p>TudoGostoso, corpus preparado na Unidade 3.</p></div></div></footer>
 </body>
 </html>

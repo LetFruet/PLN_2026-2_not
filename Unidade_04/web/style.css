@@ -30,3 +30,9 @@
 @media(max-width:620px){.tested-examples-grid{grid-template-columns:1fr}}
 
 .conclusion-points{margin:10px 0 0;padding-inline-start:20px}.conclusion-points li+li{margin-top:7px}
+
+.recipe-reason-label{display:block;margin:4px 0 8px;font-weight:700;color:var(--quiet)}
+.rag-progress{font-size:.9rem;color:var(--quiet);margin:10px 0}
+
+/* Indicação discreta da página atual; menu e aparência originais preservados. */
+.bar nav a[aria-current='page']{text-decoration:underline;text-underline-offset:5px}
